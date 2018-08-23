@@ -1,0 +1,6 @@
+name: Advancements
+main: world.bentobox.advancements.Advancements
+version: ${project.version}
+
+authors:
+- Poslovitch
