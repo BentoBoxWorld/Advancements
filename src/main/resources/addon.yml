@@ -3,4 +3,5 @@ main: world.bentobox.advancements.Advancements
 version: ${project.version}
 
 authors:
+- tastybento
 - Poslovitch
