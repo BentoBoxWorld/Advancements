@@ -2,9 +2,10 @@ package world.bentobox.advancements;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.World;
@@ -15,8 +16,8 @@ import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import world.bentobox.advancements.objects.IslandAdvancements;
-import world.bentobox.bentobox.api.events.island.IslandEvent;
+import world.bentobox.advancements.objects.IsleAdvancements;
+import world.bentobox.bentobox.api.user.User;
 import world.bentobox.bentobox.database.Database;
 import world.bentobox.bentobox.database.objects.Island;
 import world.bentobox.bentobox.managers.RanksManager;
@@ -31,11 +32,11 @@ public class AdvancementsManager {
 
     private final Advancements addon;
     // Database handler for level data
-    private final Database<IslandAdvancements> handler;
+    private final Database<IsleAdvancements> handler;
     // A cache of island levels.
-    private final Map<String, IslandAdvancements> cache;
+    private final Map<String, IsleAdvancements> cache;
     private final YamlConfiguration advConfig;
-    private int unknownAdvChange;
+    private List<String> unknownAdvChange;
 
     /**
      * @param addon
@@ -45,7 +46,7 @@ public class AdvancementsManager {
         // Get the BentoBox database
         // Set up the database handler to store and retrieve data
         // Note that these are saved by the BentoBox database
-        handler = new Database<>(addon, IslandAdvancements.class);
+        handler = new Database<>(addon, IsleAdvancements.class);
         // Initialize the cache
         cache = new HashMap<>();
         // Advancement score sheet
@@ -57,7 +58,7 @@ public class AdvancementsManager {
         } else {
             try {
                 advConfig.load(advFile);
-                unknownAdvChange = advConfig.getInt("settings.unknown-advancement-increase", 0);
+                unknownAdvChange = advConfig.getStringList("settings.unknown-advancement-reward");
             } catch (IOException | InvalidConfigurationException e) {
                 addon.logError("advancements.yml cannot be found! " + e.getLocalizedMessage());
             }
@@ -71,19 +72,19 @@ public class AdvancementsManager {
      * @return the island's advancement list object
      */
     @NonNull
-    public IslandAdvancements getIsland(Island island) {
+    public IsleAdvancements getIsland(Island island) {
         return cache.computeIfAbsent(island.getUniqueId(), this::getFromDb);
 
     }
 
     @NonNull
-    private IslandAdvancements getFromDb(String k) {
+    private IsleAdvancements getFromDb(String k) {
         if (!handler.objectExists(k)) {
-            return new IslandAdvancements(k);
+            return new IsleAdvancements(k);
         }
         @Nullable
-        IslandAdvancements ia = handler.loadObject(k);
-        return ia == null ? new IslandAdvancements(k) : ia;
+        IsleAdvancements ia = handler.loadObject(k);
+        return ia == null ? new IsleAdvancements(k) : ia;
     }
 
     /**
@@ -146,78 +147,47 @@ public class AdvancementsManager {
     }
 
     /**
-     * Check and correct the island's protection size based on accumulated advancements
-     * @param island - island to check
-     * @return value of island size change. Negative values means the island range shrank.
-     */
-    public int checkIslandSize(Island island) {
-        // Island is always a minimum of 1 for free.
-        int shouldSize = getIsland(island).getAdvancements().stream().mapToInt(this::getScore).sum() + 1;
-        if (shouldSize < 1) {
-            // Boxes can never be less than 1 in protection size
-            return 0;
-        }
-        int diff = shouldSize - island.getProtectionRange();
-        if (diff != 0) {
-            this.setProtectionSize(island, shouldSize, null);
-        }
-        return diff;
-    }
-
-    /**
-     * Add advancement to island and adjusts the island's protection size accordingly
+     * Add advancement to island and give the reward to the player
      * @param p - player who just advanced
      * @param advancement - advancement
-     * @return score for advancement. 0 if the advancement was not added.
+     * @return list of commands to run when advancement occurs. Empty if none.
      */
-    public int addAdvancement(Player p, Advancement advancement) {
+    public List<String> addAdvancement(Player p, Advancement advancement) {
         World world = Util.getWorld(p.getWorld());
         if (!addon.isRegisteredGameModeWorld(world)) {
             // Wrong world
-            return 0;
+            return Collections.emptyList();
         }
-        int score = getScore(advancement.getKey().toString());
-        if (score == 0) {
-            return 0;
+        List<String> rewards = getRewards(advancement.getKey().toString());
+        if (rewards.isEmpty()) {
+            return Collections.emptyList();
         }
         // Get island
         Island island = addon.getIslands().getIsland(world, p.getUniqueId());
         if (island != null
-                && island.getRank(p.getUniqueId()) >= RanksManager.MEMBER_RANK // Only island members expand island
+                && island.getRank(p.getUniqueId()) >= RanksManager.MEMBER_RANK // Only island members receive rewards
                 && addAdvancement(island, advancement.getKey().toString())) {
-            int oldSize = island.getProtectionRange();
-            int newSize = Math.max(1, oldSize + score);
-            setProtectionSize(island, newSize, p.getUniqueId());
-            return score;
+            Util.runCommands(User.getInstance(p), rewards, "Advancement command");
+            return rewards;
         }
-        return 0;
+        return Collections.emptyList();
 
     }
 
-    /**
-     * Sets the island protection size and fires an event for it
-     * @param island - island
-     * @param newSize - new size of protected area
-     * @param uuid - UUID of player making the change. null if the change is system-driven.
-     */
-    private void setProtectionSize(@NonNull Island island, int newSize, @Nullable UUID uuid) {
-        island.setProtectionRange(newSize);
-        // Call Protection Range Change event. Does not support canceling.
-        IslandEvent.builder()
-        .island(island)
-        .location(island.getCenter())
-        .reason(IslandEvent.Reason.RANGE_CHANGE)
-        .involvedPlayer(uuid)
-        .admin(true)
-        .protectionRange(newSize, island.getProtectionRange())
-        .build();
-
-    }
-
-    private int getScore(String string) {
-        String adv = "advancements." + string;
-        // Check score of advancement
-        return !advConfig.contains(adv) && adv.endsWith("/root") ? advConfig.getInt("settings.default-root-increase") : advConfig.getInt(adv, this.unknownAdvChange);
+    private List<String> getRewards(String advancement) {
+        String adv = "advancements." + advancement;
+        // Check rewards for advancement
+        if (advConfig.contains(adv)) {
+            return advConfig.getStringList(adv);
+        }
+        // Advancement is not explicitly called out, so use defaults
+        if (adv.endsWith("/root")) {
+            return advConfig.getStringList("settings.default-root-reward");
+        }
+        if (adv.contains("recipes")) {
+            return advConfig.getStringList("settings.default-recipe-reward");
+        }
+        return this.unknownAdvChange;
     }
 
 }

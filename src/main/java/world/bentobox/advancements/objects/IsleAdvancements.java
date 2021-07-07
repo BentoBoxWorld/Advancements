@@ -13,8 +13,8 @@ import world.bentobox.bentobox.database.objects.Table;
  * @author tastybento
  *
  */
-@Table(name = "IslandAdvancements")
-public class IslandAdvancements implements DataObject {
+@Table(name = "IsleAdvancements")
+public class IsleAdvancements implements DataObject {
 
     @Expose
     String uniqueId;
@@ -24,7 +24,7 @@ public class IslandAdvancements implements DataObject {
     /**
      * @param uniqueId
      */
-    public IslandAdvancements(String uniqueId) {
+    public IsleAdvancements(String uniqueId) {
         this.uniqueId = uniqueId;
     }
 

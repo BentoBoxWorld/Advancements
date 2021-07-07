@@ -81,15 +81,15 @@ public class AdvancementListener implements Listener {
                 return;
             }
 
-            int score = addon.getAdvManager().addAdvancement(e.getPlayer(), e.getAdvancement());
-            if (score != 0) {
+            List<String> score = addon.getAdvManager().addAdvancement(e.getPlayer(), e.getAdvancement());
+            if (!score.isEmpty()) {
                 User user = User.getInstance(e.getPlayer());
                 Bukkit.getScheduler().runTask(addon.getPlugin(), () -> tellTeam(user, e.getAdvancement().getKey(), score));
             }
         }
     }
 
-    private void tellTeam(User user, NamespacedKey key, int score) {
+    private void tellTeam(User user, NamespacedKey key, List<String> score) {
         Island island = addon.getIslands().getIsland(Util.getWorld(user.getWorld()), user);
         island.getMemberSet(RanksManager.MEMBER_RANK).stream()
         .map(User::getInstance)
@@ -109,28 +109,19 @@ public class AdvancementListener implements Listener {
 
     /**
      * Synchronize the player's advancements to that of the island.
-     * Player's advancements should be cleared before calling this othewise they will get add the island ones as well.
+     * Player's advancements should be cleared before calling this otherwise they will get add the island ones as well.
      * @param user - user
      */
     public void syncAdvancements(User user) {
         Island island = addon.getIslands().getIsland(Util.getWorld(user.getWorld()), user);
         if (island != null) {
             grantAdv(user, addon.getAdvManager().getIsland(island).getAdvancements());
-            int diff = addon.getAdvManager().checkIslandSize(island);
-            if (diff > 0) {
-                user.sendMessage("boxed.size-changed", TextVariables.NUMBER, String.valueOf(diff));
-                user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1F, 2F);
-            } else if (diff < 0) {
-                user.sendMessage("boxed.size-decreased", TextVariables.NUMBER, String.valueOf(Math.abs(diff)));
-                user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1F, 2F);
-            }
         }
     }
 
-    private void informPlayer(User user, NamespacedKey key, int score) {
+    private void informPlayer(User user, NamespacedKey key, List<String> score) {
         user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1F, 2F);
-        user.sendMessage("boxed.completed", TextVariables.NAME,  keyToString(user, key));
-        user.sendMessage("boxed.size-changed", TextVariables.NUMBER, String.valueOf(score));
+        user.sendMessage("advancements.completed", TextVariables.NAME,  keyToString(user, key));
 
     }
 
