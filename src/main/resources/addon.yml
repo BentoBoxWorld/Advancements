@@ -1,6 +1,8 @@
 name: Advancements
 main: world.bentobox.advancements.Advancements
-version: ${project.version}
+version: ${version}${build.number}
+icon: COBBLESTONE
+api-version: 1.17
 
 authors:
 - tastybento

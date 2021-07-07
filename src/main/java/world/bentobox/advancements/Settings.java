@@ -6,6 +6,7 @@ import java.util.List;
 
 import world.bentobox.bentobox.api.configuration.ConfigComment;
 import world.bentobox.bentobox.api.configuration.ConfigEntry;
+import world.bentobox.bentobox.api.configuration.ConfigObject;
 import world.bentobox.bentobox.api.configuration.StoreAt;
 
 /**
@@ -14,7 +15,7 @@ import world.bentobox.bentobox.api.configuration.StoreAt;
  */
 @StoreAt(filename="config.yml", path="addons/Advancements") // Explicitly call out what name this should have.
 @ConfigComment("Advancements Configuration [version]")
-public class Settings {
+public class Settings implements ConfigObject {
     @ConfigComment("")
     @ConfigComment("Disabled Game Mode Addons")
     @ConfigComment("Level will NOT hook into these game mode addons.")

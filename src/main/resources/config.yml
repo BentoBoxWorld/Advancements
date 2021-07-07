@@ -1,0 +1,23 @@
+# Advancements Configuration {$version}
+# 
+# Disabled Game Mode Addons
+# Level will NOT hook into these game mode addons.
+disabled-game-modes:
+- Boxed
+# 
+# Announce advancements. We recommend you set the game rule `/gamerule announceAdvancements false`
+# but that blocks all new advancement announcements. This setting tells Boxed to broadcast new advancements.
+broadcast-advancements: false
+reset:
+  on-join:
+    # 
+    # Reset advancements.
+    reset-advancements: true
+    # Grant these advancements
+    grant-advancements:
+    - minecraft:story/root 
+  on-leave:
+    # Reset advancements.
+    reset-advancements: false
+    # Grant these advancements
+    grant-advancements: []
