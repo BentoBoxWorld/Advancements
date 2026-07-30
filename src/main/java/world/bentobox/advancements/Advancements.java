@@ -11,11 +11,16 @@ import world.bentobox.bentobox.api.addons.GameModeAddon;
 import world.bentobox.bentobox.api.configuration.Config;
 import world.bentobox.bentobox.util.Util;
 
+/**
+ * Ties vanilla advancements to islands: advancements are earned once per island, grow the
+ * island's protection range, and give Challenges-style rewards to the player.
+ * @author tastybento
+ */
 public class Advancements extends Addon {
 
     // Settings
     private Settings settings;
-    private Config<Settings> configObject = new Config<>(this, Settings.class);
+    private final Config<Settings> configObject = new Config<>(this, Settings.class);
     private final List<GameModeAddon> registeredGameModes = new ArrayList<>();
 
     private AdvancementsManager advManager;
@@ -39,28 +44,50 @@ public class Advancements extends Addon {
     }
 
     @Override
-    public void onDisable() {
-        // Save the advancements cache
-        getAdvManager().save();
+    public void onReload() {
+        if (loadSettings()) {
+            logError("Advancement settings could not load! Addon disabled.");
+            setState(State.DISABLED);
+        }
+    }
 
+    @Override
+    public void onDisable() {
+        if (advManager != null) {
+            // Save the advancements cache
+            advManager.save();
+        }
     }
 
     @Override
     public void onEnable() {
+        if (settings == null) {
+            // Settings did not load - do not enable
+            return;
+        }
         // Advancements manager
         advManager = new AdvancementsManager(this);
         // Register listeners
         this.registerListener(new AdvancementListener(this));
-        // Register commands for GameModes
+        // Hook into game modes
         registeredGameModes.clear();
         getPlugin().getAddonsManager().getGameModeAddons().stream()
         .filter(gm -> !settings.getGameModes().contains(gm.getDescription().getName()))
         .forEach(gm -> {
             log("Advancements hooking into " + gm.getDescription().getName());
-            //registerCommands(gm);
-            //registerPlaceholders(gm);
             registeredGameModes.add(gm);
         });
+        // Register placeholders
+        registerPlaceholders();
+    }
+
+    private void registerPlaceholders() {
+        if (getPlugin().getPlaceholdersManager() == null) {
+            return;
+        }
+        PlaceholdersManager phManager = new PlaceholdersManager(this);
+        getPlugin().getPlaceholdersManager().registerPlaceholder(this, "island_count", phManager::getCount);
+        getPlugin().getPlaceholdersManager().registerPlaceholder(this, "visited_island_count", phManager::getCountByLocation);
     }
 
     /**
@@ -94,12 +121,13 @@ public class Advancements extends Addon {
     }
 
     /**
-     * Checks if addon is active in world
+     * Checks if addon is active in world. The world may be any dimension of a game mode.
      * @param world world
      * @return true if active, false if not
      */
     public boolean isRegisteredGameModeWorld(World world) {
-        return registeredGameModes.stream().map(GameModeAddon::getOverWorld).anyMatch(w -> Util.sameWorld(world, w));
+        return world != null && registeredGameModes.stream().map(GameModeAddon::getOverWorld)
+                .anyMatch(w -> Util.sameWorld(world, w));
     }
 
 }

@@ -1,7 +1,6 @@
 package world.bentobox.advancements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import world.bentobox.bentobox.api.configuration.ConfigComment;
@@ -11,22 +10,29 @@ import world.bentobox.bentobox.api.configuration.StoreAt;
 
 /**
  * All the settings are here
- * @author Tastybento
+ * @author tastybento
  */
 @StoreAt(filename="config.yml", path="addons/Advancements") // Explicitly call out what name this should have.
 @ConfigComment("Advancements Configuration [version]")
 public class Settings implements ConfigObject {
     @ConfigComment("")
     @ConfigComment("Disabled Game Mode Addons")
-    @ConfigComment("Level will NOT hook into these game mode addons.")
+    @ConfigComment("Advancements will NOT hook into these game mode addons.")
+    @ConfigComment("Boxed is disabled by default because it has its own built-in advancements handling.")
     @ConfigEntry(path = "disabled-game-modes")
-    private List<String> gameModes = Collections.singletonList("Boxed");
+    private List<String> gameModes = new ArrayList<>(List.of("Boxed"));
 
     @ConfigComment("")
     @ConfigComment("Announce advancements. We recommend you set the game rule `/gamerule announceAdvancements false`")
-    @ConfigComment("but that blocks all new advancement announcements. This setting tells Boxed to broadcast new advancements.")
+    @ConfigComment("but that blocks all new advancement announcements. This setting broadcasts new advancements.")
     @ConfigEntry(path = "broadcast-advancements")
     private boolean broadcastAdvancements;
+
+    @ConfigComment("")
+    @ConfigComment("Only allow island members to complete advancements. Visitors on an island will have")
+    @ConfigComment("any advancement they complete revoked.")
+    @ConfigEntry(path = "deny-visitor-advancements")
+    private boolean denyVisitorAdvancements = true;
 
     @ConfigComment("")
     @ConfigComment("Reset advancements.")
@@ -41,6 +47,7 @@ public class Settings implements ConfigObject {
     @ConfigComment("Grant these advancements")
     @ConfigEntry(path = "reset.on-leave.grant-advancements")
     private List<String> onLeaveGrantAdvancements = new ArrayList<>();
+
     /**
      * @return the gameModes
      */
@@ -64,6 +71,18 @@ public class Settings implements ConfigObject {
      */
     public void setBroadcastAdvancements(boolean broadcastAdvancements) {
         this.broadcastAdvancements = broadcastAdvancements;
+    }
+    /**
+     * @return the denyVisitorAdvancements
+     */
+    public boolean isDenyVisitorAdvancements() {
+        return denyVisitorAdvancements;
+    }
+    /**
+     * @param denyVisitorAdvancements the denyVisitorAdvancements to set
+     */
+    public void setDenyVisitorAdvancements(boolean denyVisitorAdvancements) {
+        this.denyVisitorAdvancements = denyVisitorAdvancements;
     }
     /**
      * @return the onJoinResetAdvancements
@@ -113,6 +132,5 @@ public class Settings implements ConfigObject {
     public void setOnLeaveGrantAdvancements(List<String> onLeaveGrantAdvancements) {
         this.onLeaveGrantAdvancements = onLeaveGrantAdvancements;
     }
-
 
 }

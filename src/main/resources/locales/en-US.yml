@@ -1,2 +1,11 @@
+---
 advancements:
-  completed: &a You completed the [name]!
+  completed: '&a [name] completed!'
+  size-changed: '&a Island protected area increased by [number]!'
+  size-decreased: '&c Island protected area decreased by [number]!'
+  user-completed: '&a [name] completed [description]!'
+  adv-disallowed: '&c You can only complete advancements on your own island. Revoking [description].'
+  # Optional friendly names for advancements. If not listed, the advancement key is prettified.
+  # Example:
+  # names:
+  #   'minecraft:end/kill_dragon': 'Free the End'
