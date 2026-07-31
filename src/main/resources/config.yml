@@ -1,0 +1,26 @@
+# Advancements Configuration ${version}
+#
+# Disabled Game Mode Addons
+# Advancements will NOT hook into these game mode addons.
+# Boxed is disabled by default because it has its own built-in advancements handling.
+disabled-game-modes:
+- Boxed
+#
+# Announce advancements. We recommend you set the game rule `/gamerule announceAdvancements false`
+# but that blocks all new advancement announcements. This setting broadcasts new advancements.
+broadcast-advancements: false
+#
+# Only allow island members to complete advancements. Visitors on an island will have
+# any advancement they complete revoked.
+deny-visitor-advancements: true
+#
+# Reset advancements.
+reset:
+  on-join:
+    reset-advancements: true
+    # Grant these advancements
+    grant-advancements: []
+  on-leave:
+    reset-advancements: false
+    # Grant these advancements
+    grant-advancements: []

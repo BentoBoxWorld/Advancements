@@ -1,0 +1,137 @@
+# Advancement score and reward sheet.
+#
+# Each advancement can give two things, once per island:
+#   1. A protection range increase for the island (the "score")
+#   2. A reward for the player who completed it: items, experience, money and commands
+#
+# Advancement keys are the vanilla namespaced key without the "minecraft:" prefix,
+# e.g. 'adventure/kill_a_mob'.
+#
+# An entry may be a plain number (protection range increase only):
+#   'adventure/kill_a_mob': 4
+#
+# ...or a section with a protection-range and/or a rewards block:
+#   'end/kill_dragon':
+#     protection-range: 2
+#     rewards:
+#       items:
+#       - DIAMOND:5
+#       experience: 100
+#       money: 100.0
+#       commands:
+#       - give [player] elytra 1
+#
+# Reward notes:
+# - items use the BentoBox item format, e.g. GOLD_INGOT:1 or POTION:JUMP:2:NOTEXTENDED:SPLASH:1
+# - money requires an economy plugin (Vault)
+# - commands run from the console; [player] is replaced by the player's name and the
+#   [SUDO] prefix makes the command run as the player
+#
+# Advancements not listed here use the defaults from the settings section below:
+# - roots (keys ending in /root) use default-root-increase and default-root-reward
+# - recipes use unknown-recipe-increase and default-recipe-reward
+# - everything else uses unknown-advancement-increase and unknown-advancement-reward
+# An advancement with a score of 0 and no reward is not tracked at all.
+settings:
+  default-root-increase: 0
+  unknown-advancement-increase: 1
+  unknown-recipe-increase: 0
+  default-root-reward: {}
+  default-recipe-reward: {}
+  unknown-advancement-reward:
+    items:
+    - GOLD_INGOT:1
+    commands:
+    - tellraw [player] {"text":"Have a Gold Bar!","color":"green"}
+advancements:
+  'adventure/adventuring_time': 13
+  'adventure/arbalistic': 11
+  'adventure/avoid_vibration': 13
+  'adventure/bullseye': 5
+  'adventure/fall_from_world_height': 12
+  'adventure/hero_of_the_village': 2
+  'adventure/honey_block_slide': 9
+  'adventure/kill_a_mob': 4
+  'adventure/kill_all_mobs': 5
+  'adventure/kill_mob_near_sculk_catalyst': 4
+  'adventure/lightning_rod_with_villager_no_fire': 11
+  'adventure/ol_betsy': 10
+  'adventure/play_jukebox_in_meadows': 14
+  'adventure/root': 0
+  'adventure/shoot_arrow': 4
+  'adventure/sleep_in_bed': 14
+  'adventure/sniper_duel': 5
+  'adventure/spyglass_at_dragon': 3
+  'adventure/spyglass_at_ghast': 2
+  'adventure/spyglass_at_parrot': 1
+  'adventure/summon_iron_golem': 7
+  'adventure/throw_trident': 3
+  'adventure/totem_of_undying': 6
+  'adventure/trade_at_world_height': 8
+  'adventure/trade': 8
+  'adventure/two_birds_one_arrow': 9
+  'adventure/very_very_frightening': 4
+  'adventure/voluntary_exile': 1
+  'adventure/walk_on_powder_snow_with_leather_boots': 15
+  'adventure/whos_the_pillager_now': 10
+  'end/dragon_breath': 4
+  'end/dragon_egg': 2
+  'end/elytra': 4
+  'end/enter_end_gateway': 2
+  'end/find_end_city': 3
+  'end/kill_dragon':
+    protection-range: 2
+    rewards:
+      items:
+      - DIAMOND:5
+      experience: 100
+  'end/levitate': 4
+  'end/respawn_dragon': 3
+  'end/root': 0
+  'husbandry/allay_deliver_cake_to_note_block': 3
+  'husbandry/allay_deliver_item_to_player': 2
+  'husbandry/axolotl_in_a_bucket': 7
+  'husbandry/balanced_diet': 9
+  'husbandry/bred_all_animals': 2
+  'husbandry/breed_an_animal': 1
+  'husbandry/complete_catalogue': 4
+  'husbandry/fishy_business': 6
+  'husbandry/froglights': 9
+  'husbandry/kill_axolotl_target': 7
+  'husbandry/leash_all_frog_variants': 8
+  'husbandry/make_a_sign_glow': 5
+  'husbandry/obtain_netherite_hoe': 10
+  'husbandry/plant_seed': 10
+  'husbandry/ride_a_boat_with_a_goat': 3
+  'husbandry/root': 0
+  'husbandry/safely_harvest_honey': 1
+  'husbandry/silk_touch_nest': 7
+  'husbandry/tactical_fishing': 6
+  'husbandry/tadpole_in_a_bucket': 8
+  'husbandry/tame_an_animal': 4
+  'husbandry/wax_off': 3
+  'husbandry/wax_on': 2
+  'nether/all_effects': 7
+  'nether/all_potions': 6
+  'nether/brew_potion': 6
+  'nether/charge_respawn_anchor': 6
+  'nether/create_beacon': 6
+  'nether/create_full_beacon': 6
+  'nether/distract_piglin': 7
+  'nether/explore_nether': 9
+  'nether/fast_travel': 4
+  'nether/find_bastion': 1
+  'nether/find_fortress': 5
+  'nether/get_wither_skull': 4
+  'nether/loot_bastion': 2
+  'nether/netherite_armor': 4
+  'nether/obtain_ancient_debris': 3
+  'nether/obtain_blaze_rod': 5
+  'nether/obtain_crying_obsidian': 6
+  'nether/return_to_sender': 1
+  'nether/ride_strider_in_overworld_lava': 8
+  'nether/ride_strider': 8
+  'nether/root': 0
+  'nether/summon_wither': 5
+  'nether/uneasy_alliance': 2
+  'nether/use_lodestone': 3

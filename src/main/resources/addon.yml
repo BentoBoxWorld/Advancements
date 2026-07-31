@@ -1,6 +1,12 @@
 name: Advancements
 main: world.bentobox.advancements.Advancements
-version: ${project.version}
+version: ${version}${build.number}
+icon: KNOWLEDGE_BOOK
+api-version: 3.14.0
+repository: "BentoBoxWorld/Advancements"
 
 authors:
+- tastybento
 - Poslovitch
+
+softdepend: BSkyBlock, AcidIsland, SkyGrid, CaveBlock, AOneBlock, Boxed

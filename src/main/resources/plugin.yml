@@ -1,0 +1,9 @@
+name: BentoBox-Advancements
+main: world.bentobox.advancements.AdvancementsPladdon
+version: ${project.version}${build.number}
+api-version: "1.21"
+
+authors: [tastybento, Poslovitch]
+contributors: ["The BentoBoxWorld Community"]
+website: https://bentobox.world
+description: ${project.description}
